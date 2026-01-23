@@ -1,0 +1,39 @@
+E# Используем Alt как главный модификатор
+set $mod Mod1
+
+# Шрифт для i3
+font pango:monospace 10
+
+# Запускаем lxterminal по Alt+Enter
+bindsym $mod+Return exec lxterminal
+
+# Запускаем dmenu по Alt+d
+bindsym $mod+d exec dmenu_run
+
+# Выход из i3 по Alt+Shift+e
+bindsym $mod+Shift+e exit
+
+# Перемещение фокуса
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# Перемещение окон
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# Основные хоткеи
+bindsym $mod+Return exec xterm
+bindsym $mod+d exec dmenu_run
+bindsym $mod+Shift+e exit
+
+# Статусбар сверху
+bar {
+    position top
+    status_command i3status
+    font pango:monospace 10
+}
+

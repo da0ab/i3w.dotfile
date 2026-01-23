@@ -1,0 +1,11 @@
+* {
+  background:      #000000;   /* белый фон */
+  background-alt:  #f0f0f0;   /* чуть серее при наведении */
+  foreground:      #ffffff;   /* чёрный текст */
+  selected:        #d0d0d0;   /* выделение */
+  active:          #000000;
+  urgent:          #ff0000;
+  border:          0;
+  padding:         5;
+  font:            "monospace 10";
+}

@@ -1,0 +1,233 @@
+set $mod Mod4
+set $mod1 Mod1
+set $term st
+
+# Шрифт для i3
+font pango:monospace 10
+
+# ============================================
+# Именные столы
+# ============================================
+set $ws1 "1: home"
+set $ws2 "2: term"
+set $ws3 "3: tg"
+set $ws4 "4: web"
+set $ws5 "5: files"
+set $ws6 "6: gimp"
+set $ws7 "7: ftp"
+set $ws8 "8:  kee"
+set $ws9 "9"
+
+# ============================================
+# Создание всех столов при старте
+# ============================================
+exec --no-startup-id i3-msg "workspace $ws1"
+exec --no-startup-id i3-msg "workspace $ws2"
+exec --no-startup-id i3-msg "workspace $ws3"
+exec --no-startup-id i3-msg "workspace $ws4"
+exec --no-startup-id i3-msg "workspace $ws5"
+exec --no-startup-id i3-msg "workspace $ws6"
+exec --no-startup-id i3-msg "workspace $ws7"
+exec --no-startup-id i3-msg "workspace $ws8"
+exec --no-startup-id i3-msg "workspace $ws9"
+
+# ============================================
+# Привязка приложений к столам
+# ============================================
+assign [class="Telegram"]  → $ws3
+assign [class="Firefox"]   → $ws4
+assign [class="Gimp"]      → $ws6
+assign [class="FileZilla"] → $ws7
+assign [class="KeePassXC"] → $ws8
+
+# ============================================
+# Переключение рабочих пространств
+# ============================================
+bindsym $mod+1 workspace $ws1
+bindsym $mod+2 workspace $ws2
+bindsym $mod+3 workspace $ws3
+bindsym $mod+4 workspace $ws4
+bindsym $mod+5 workspace $ws5
+bindsym $mod+6 workspace $ws6
+bindsym $mod+7 workspace $ws7
+bindsym $mod+8 workspace $ws8
+bindsym $mod+9 workspace $ws9
+
+# ============================================
+# Перемещение на рабочее пространство
+# ============================================
+bindsym $mod+Shift+1 move container to workspace $ws1
+bindsym $mod+Shift+2 move container to workspace $ws2
+bindsym $mod+Shift+3 move container to workspace $ws3
+bindsym $mod+Shift+4 move container to workspace $ws4
+bindsym $mod+Shift+5 move container to workspace $ws5
+bindsym $mod+Shift+6 move container to workspace $ws6
+bindsym $mod+Shift+7 move container to workspace $ws7
+bindsym $mod+Shift+8 move container to workspace $ws8
+bindsym $mod+Shift+9 move container to workspace $ws9
+
+# ============================================
+# Смена размеров окна
+# ============================================
+
+# Увеличить активное окно
+bindsym $mod+equal resize grow width 10 px or 10 ppt
+bindsym $mod+Shift+equal resize grow height 10 px or 10 ppt
+
+# Уменьшить активное окно
+bindsym $mod+minus resize shrink width 10 px or 10 ppt
+bindsym $mod+Shift+minus resize shrink height 10 px or 10 ppt
+
+# ============================================
+# Плавающие окна - управление
+# ============================================
+
+# Переключить плавающее/тайловое
+bindsym $mod+Shift+space floating toggle
+
+# Полноэкранный режим (работает для любых окон)
+bindsym $mod+f fullscreen toggle
+
+# Для плавающих: расширить до полного экрана
+bindsym $mod+Shift+f [floating] fullscreen toggle
+
+# Для плавающих: зафиксировать размер как у экрана
+bindsym $mod+Ctrl+f [floating] resize set $(xdpyinfo | grep dimensions | awk '{print $2}' | sed 's/x/ /'), move position 0 0
+
+# Вернуть нормальный размер плавающего окна
+bindsym $mod+Ctrl+Shift+f [floating] resize shrink width 400, resize shrink height 300, move position center
+
+# ============================================
+# Фокус
+# ============================================
+
+# Фокус следует за мышью (вместо активного окна)
+focus_follows_mouse no
+
+# Сохранять фокус при переключении воркспейсов
+focus_wrapping no
+
+# Автоматически переводить фокус на новое окно
+focus_on_window_activation smart
+
+
+# ============================================
+# Автозапуск
+# ============================================
+
+# polybar
+exec_always --no-startup-id bash -c "killall -q polybar; polybar main &"
+
+# Фон
+exec --no-startup-id feh --bg-fill "$HOME/.config/i3/fon.png"
+
+exec --no-startup-id i3-msg "workspace $ws3; exec ~/soft/Telegram/Telegram"
+exec --no-startup-id i3-msg "workspace $ws4; exec firefox"
+
+# neofetch
+exec --no-startup-id bash -c 'i3-msg "workspace $ws1"; $term -e bash -c "neofetch; exec bash"'
+
+# Вернуться на первый рабочий стол
+exec --no-startup-id i3-msg "workspace $ws1"
+
+# ============================================
+# ALT-shortcuts определить класс окна: xprop | grep WM_CLASS
+# ============================================
+bindsym $mod1+k exec --no-startup-id keepassxc
+bindsym $mod1+f exec --no-startup-id filezilla
+bindsym $mod1+g exec --no-startup-id gvim
+
+# scrot
+bindsym Print exec scrot -d 0 'screenshot_%y-%m-%d_%H:%M:%S.png' -e 'mv $f ~/screen/'
+#bindsym Ctrl+Print exec scrot -s 'area_%y-%m-%d_%H:%M:%S.png' -e 'mv $f ~/screen/'
+
+# ============================================
+# Перемещение
+# ============================================
+
+# Перемещение по окнам по кругу
+bindsym $mod+Tab workspace back_and_forth
+
+# Перемещение фокуса (Vim style)
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# Перемещение фокуса
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Перемещение окна  (Vim style)
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# Перемещение окна
+bindsym $mod+Shift+Left  move left
+bindsym $mod+Shift+Down  move down
+bindsym $mod+Shift+Up    move up
+bindsym $mod+Shift+Right move right
+
+# ============================================
+# Деление окон
+# ============================================
+bindsym $mod+F6 split vertical
+bindsym $mod+F7 split horizontal
+
+# ============================================
+# Базовые клавиши
+# ============================================
+
+# Запускаем терминала
+bindsym $mod+Return exec $term
+
+# Запускаем rofi
+bindsym $mod+d exec rofi -show drun
+
+# Перезагруз i3
+bindsym $mod+Shift+r reload
+
+# Выход из i3
+bindsym $mod+Shift+e exit
+
+# Закрытие окна
+bindsym Control+q kill
+
+# ============================================
+# xclip
+# ============================================
+
+# Копирование
+bindsym $mod+c exec --no-startup-id copy_filename.sh
+bindsym $mod+Shift+c exec --no-startup-id copy_filepath.sh
+bindsym $mod+Ctrl+c exec --no-startup-id copy_file_content.sh
+bindsym $mod+Alt+c exec --no-startup-id copy_filelist.sh
+
+# Вставка
+bindsym $mod+v exec --no-startup-id paste_last_buffer.sh
+
+# ============================================
+# Rofi
+# ============================================
+
+# Выключенние машины
+bindsym $mod+Shift+q exec --no-startup-id ~/.config/rofi/scripts/power-menu.sh
+
+# Скан сети
+bindsym $mod+Shift+w exec --no-startup-id ~/.config/rofi/scripts/wifi.sh
+
+# Список настроек
+bindsym $mod+Shift+t exec --no-startup-id ~/.config/rofi/scripts/rofi-list.sh
+
+# Монтирование
+#exec --no-startup-id udiskie -t &
+
+# Drakula цвета gvim ~/.config/polybar/config.ini
+client.focused          #44475A #44475A #F8F8F2 #BD93F9 #F8F8F2
+client.unfocused        #282A36 #282A36 #6272A4 #282A36 #6272A4
+client.focused_inactive #282A36 #282A36 #6272A4 #282A36 #6272A4
+client.urgent           #FF5555 #FF5555 #F8F8F2 #FF5555 #F8F8F2

@@ -1,0 +1,11 @@
+~/.bashrc
+~/.bashrc.d/10-aliases.sh
+
+~/.gtkrc-2.0
+~/.xbindkeysrc
+~/.Xresources
+
+~/.config/i3/config
+~/.config/polybar/config.ini
+~/.config/superfile/config.toml
+
