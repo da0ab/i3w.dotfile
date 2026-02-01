@@ -97,6 +97,9 @@ bindsym $mod+Ctrl+f [floating] resize set $(xdpyinfo | grep dimensions | awk '{p
 # Вернуть нормальный размер плавающего окна
 bindsym $mod+Ctrl+Shift+f [floating] resize shrink width 400, resize shrink height 300, move position center
 
+# Сделать менеджер сайтов FileZilla полноэкранным
+for_window [class="FileZilla"] fullscreen enable, floating disable
+
 # ============================================
 # Фокус
 # ============================================
@@ -197,18 +200,6 @@ bindsym $mod+Shift+e exit
 # Закрытие окна
 bindsym Control+q kill
 
-# ============================================
-# xclip
-# ============================================
-
-# Копирование
-bindsym $mod+c exec --no-startup-id copy_filename.sh
-bindsym $mod+Shift+c exec --no-startup-id copy_filepath.sh
-bindsym $mod+Ctrl+c exec --no-startup-id copy_file_content.sh
-bindsym $mod+Alt+c exec --no-startup-id copy_filelist.sh
-
-# Вставка
-bindsym $mod+v exec --no-startup-id paste_last_buffer.sh
 
 # ============================================
 # Rofi
