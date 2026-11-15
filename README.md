@@ -1,5 +1,5 @@
 # i3w-lazy
-i3w config +  polybar rofi feh picom
+i3w config +  polybar rofi feh picom wezterm  scrot
 
 # Горячие клавиши i3 (Mod4 = Win)
 
