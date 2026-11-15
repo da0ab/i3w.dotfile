@@ -31,9 +31,9 @@ elif [[ "$status" == "Discharging" ]]; then
         fi
     else
         if [[ -n "$time" ]]; then
-            echo "Разряд: ${percent}% – $time"
+            echo "Осталось: ${percent}% – $time"
         else
-            echo "Разряд: ${percent}%"
+            echo "Осталось: ${percent}%"
         fi
     fi
 elif [[ "$status" == "Full" ]]; then

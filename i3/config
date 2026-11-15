@@ -1,6 +1,11 @@
 set $mod Mod4
 set $mod1 Mod1
-set $term st
+set $term wezterm
+exec --no-startup-id picom -b
+
+# Убираем стандартные рамки, они нам больше не нужны
+new_window none
+new_float none
 
 # Шрифт для i3
 font pango:monospace 10
@@ -35,10 +40,19 @@ exec --no-startup-id i3-msg "workspace $ws9"
 # Привязка приложений к столам
 # ============================================
 assign [class="Telegram"]  → $ws3
-assign [class="Firefox"]   → $ws4
+assign [class="Google-chrome"]   → $ws4
 assign [class="Gimp"]      → $ws6
 assign [class="FileZilla"] → $ws7
 assign [class="KeePassXC"] → $ws8
+
+# ============================================
+# И делать плавающими
+# ============================================
+for_window [class="Google-chrome"] floating enable
+for_window [class="Gimp"] floating enable
+for_window [class="FileZilla"] floating enable
+for_window [class="Inkscape"] floating enable
+for_window [class="KeePassXC"] floating enable
 
 # ============================================
 # Переключение рабочих пространств
@@ -90,6 +104,12 @@ bindsym $mod+f fullscreen toggle
 
 # Для плавающих: расширить до полного экрана
 bindsym $mod+Shift+f [floating] fullscreen toggle
+#popup_during_fullscreen all
+popup_during_fullscreen smart
+
+
+# Использование Alt+Tab для вызова интерфейса выбора окон Rofi
+bindsym Mod1+Tab exec --no-startup-id rofi -show window
 
 # Для плавающих: зафиксировать размер как у экрана
 bindsym $mod+Ctrl+f [floating] resize set $(xdpyinfo | grep dimensions | awk '{print $2}' | sed 's/x/ /'), move position 0 0
@@ -98,7 +118,7 @@ bindsym $mod+Ctrl+f [floating] resize set $(xdpyinfo | grep dimensions | awk '{p
 bindsym $mod+Ctrl+Shift+f [floating] resize shrink width 400, resize shrink height 300, move position center
 
 # Сделать менеджер сайтов FileZilla полноэкранным
-for_window [class="FileZilla"] fullscreen enable, floating disable
+#for_window [class="FileZilla"] fullscreen enable, floating disable
 
 # ============================================
 # Фокус
@@ -128,7 +148,9 @@ exec --no-startup-id i3-msg "workspace $ws3; exec ~/soft/Telegram/Telegram"
 exec --no-startup-id i3-msg "workspace $ws4; exec firefox"
 
 # neofetch
-exec --no-startup-id bash -c 'i3-msg "workspace $ws1"; $term -e bash -c "neofetch; exec bash"'
+#exec --no-startup-id bash -c 'i3-msg "workspace $ws1"; $term -e bash -c "neofetch; exec bash"'
+
+exec --no-startup-id bash -c 'i3-msg "workspace $ws1"; $term -e bash -c "nvim; exec bash"'
 
 # Вернуться на первый рабочий стол
 exec --no-startup-id i3-msg "workspace $ws1"
@@ -200,7 +222,6 @@ bindsym $mod+Shift+e exit
 # Закрытие окна
 bindsym Control+q kill
 
-
 # ============================================
 # Rofi
 # ============================================
@@ -214,8 +235,6 @@ bindsym $mod+Shift+w exec --no-startup-id ~/.config/rofi/scripts/wifi.sh
 # Список настроек
 bindsym $mod+Shift+t exec --no-startup-id ~/.config/rofi/scripts/rofi-list.sh
 
-# Монтирование
-#exec --no-startup-id udiskie -t &
 
 # Drakula цвета gvim ~/.config/polybar/config.ini
 client.focused          #44475A #44475A #F8F8F2 #BD93F9 #F8F8F2

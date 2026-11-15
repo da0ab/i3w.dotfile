@@ -1,32 +1,87 @@
 # i3w-lazy
-i3w config + more
+i3w config +  polybar rofi feh picom
 
+# Горячие клавиши i3 (Mod4 = Win)
 
+## 🚀 Запуск приложений
 
+| Клавиши | Действие |
+|---|---|
+| `Mod4 + Return` | Терминал (`wezterm`) |
+| `Mod4 + d` | Rofi (запуск приложений, `drun`) |
+| `Alt + Tab` | Rofi — список окон (`rofi -show window`) |
+| `Alt + k` | KeePassXC |
+| `Alt + f` | FileZilla |
+| `Alt + g` | GVim |
+| `Print` | Скриншот всего экрана (`scrot`) |
 
+## 🖥️ Рабочие столы
 
-~/.config/
-├── i3/
-│   └── config
-├── i3status/
-│   ├── config
-│   └── i3status-wrapper.sh chmod +x
+| Клавиши | Действие |
+|---|---|
+| `Mod4 + 1..9` | Переключиться на стол 1..9 |
+| `Mod4 + Shift + 1..9` | Переместить окно на стол 1..9 |
+| `Mod4 + Tab` | Вернуться на предыдущий стол (`back_and_forth`) |
 
+Именованные столы: `1: home`, `2: term`, `3: tg`, `4: web`, `5: files`, `6: gimp`, `7: ftp`, `8: kee`, `9`.
 
+## 🪟 Плавающие окна и полноэкранный режим
 
+| Клавиши | Действие |
+|---|---|
+| `Mod4 + Shift + Space` | Переключить плавающее/тайловое |
+| `Mod4 + f` | Полноэкранный режим (любое окно) |
+| `Mod4 + Shift + f` | Полноэкранный режим (только плавающее) |
+| `Mod4 + Ctrl + f` | Плавающему: размер как у экрана + позиция 0,0 |
+| `Mod4 + Ctrl + Shift + f` | Вернуть плавающему нормальный размер по центру |
 
-https://github.com/nonpop/xkblayout-state
+> Примечание: `popup_during_fullscreen smart` — всплывающие окна приложения в полноэкране показываются, но не выводят из fullscreen.
 
-sudo apt install libx11-dev libxkbfile-dev gcc make
+## 🎯 Фокус и перемещение
 
+| Клавиши | Действие |
+|---|---|
+| `Mod4 + h/j/k/l` | Фокус влево/вниз/вверх/вправо (Vim) |
+| `Mod4 + ←/↓/↑/→` | Фокус стрелками |
+| `Mod4 + Shift + h/j/k/l` | Переместить окно (Vim) |
+| `Mod4 + Shift + ←/↓/↑/→` | Переместить окно стрелками |
 
-git clone https://github.com/nonpop/xkblayout-state
-cd xkblayout-state
-make
-sudo make install
+## 📐 Размеры и деление
 
+| Клавиши | Действие |
+|---|---|
+| `Mod4 + =` | Увеличить ширину |
+| `Mod4 + Shift + =` | Увеличить высоту |
+| `Mod4 + -` | Уменьшить ширину |
+| `Mod4 + Shift + -` | Уменьшить высоту |
+| `Mod4 + F6` | Разделить вертикально |
+| `Mod4 + F7` | Разделить горизонтально |
 
+## ⚙️ Управление i3 и окнами
 
-git clone https://github.com/dracula/rofi
+| Клавиши | Действие |
+|---|---|
+| `Mod4 + Shift + r` | Перезагрузить конфиг i3 (`reload`) |
+| `Mod4 + Shift + e` | Выйти из i3 (`exit`) |
+| `Ctrl + q` | Закрыть окно (`kill`) |
 
-cp rofi/theme/config1.rasi ~/.config/rofi/config.rasi
+## 🔧 Rofi-скрипты
+
+| Клавиши | Действие |
+|---|---|
+| `Mod4 + Shift + q` | Меню выключения (`power-menu.sh`) |
+| `Mod4 + Shift + w` | Скан сети (`wifi.sh`) |
+| `Mod4 + Shift + t` | Список настроек (`rofi-list.sh`) |
+
+## 📌 Автозапуск
+
+- `picom -b` — композитор
+- `polybar main` — статус-бар (`exec_always`, перезапускается при reload)
+- `feh --bg-fill ~/.config/i3/fon.png` — обои
+- `nvim` в `wezterm` на столе `1: home`
+
+## 🖱️ Поведение
+
+- `focus_follows_mouse no` — фокус не следует за мышью
+- `focus_wrapping no` — фокус не переходит на соседний стол
+- `focus_on_window_activation smart` — умный перевод фокуса на новое окно
