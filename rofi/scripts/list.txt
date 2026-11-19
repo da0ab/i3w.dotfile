@@ -1,11 +1,18 @@
+~/.config/i3/config
+~/.config/polybar/config.ini
+~/.config/rofi/config.rasi
+~/.config/rofi/scripts/list.txt
+
 ~/.bashrc
-~/.bashrc.d/10-aliases.sh
+~/.bashrc.d/01-exports.sh
+~/.bashrc.d/02-history.sh
+~/.bashrc.d/03-aliases.sh
+~/.bashrc.d/04-autocomplit.sh
+~/.bashrc.d/05-fzf-lsd-zoxide.sh
+~/.bashrc.d/06-prompt.sh
+~/.bashrc.d/07-nnn.sh 
+~/.bashrc.d/08-functions.sh
 
 ~/.gtkrc-2.0
 ~/.xbindkeysrc
 ~/.Xresources
-
-~/.config/i3/config
-~/.config/polybar/config.ini
-~/.config/superfile/config.toml
-

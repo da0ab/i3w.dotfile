@@ -2,40 +2,35 @@
 set -euo pipefail
 
 LISTFILE="$HOME/.config/rofi/scripts/list.txt"
-MENUTITLE="GVim"
-EDITLABEL="⚙️ Редактировать список"
+MENUTITLE="Neovim"
+EDITLABEL="✎ Редактировать список"
 
+# Создаем директорию и файл, если их нет
 mkdir -p "$(dirname "$LISTFILE")"
-if [ ! -f "$LISTFILE" ]; then
-  cat > "$LISTFILE" <<'EOF'
-# Список файлов/проектов для gVim.
-# По одной записи на строку. Можно использовать ~ для $HOME.
-# Примеры:
-~/notes/todo.md
-~/code/project/README.md
-EOF
-fi
+touch "$LISTFILE"
 
-# Собираем пункты: игнорируем пустые строки и комментарии
-mapfile -t entries < <(grep -v '^\s*#' "$LISTFILE" | sed '/^\s*$/d')
+# Читаем строки, убирая комментарии, пустые строки и крайние пробелы (без падения при пустом файле)
+mapfile -t entries < <(awk '
+  /^[[:space:]]*(#|$)/ { next }
+  { gsub(/^[[:space:]]+|[[:space:]]+$/, ""); print }
+' "$LISTFILE")
+
 entries+=("$EDITLABEL")
 
 # Показываем меню
-choice=$(printf '%s\n' "${entries[@]}" | rofi -dmenu -i -p "$MENUTITLE" -width 60 || true)
+choice=$(printf '%s\n' "${entries[@]}" | rofi -dmenu -i -p "$MENUTITLE" -theme-str 'window {width: 60ch;}' || true)
 [ -z "${choice:-}" ] && exit 0
 
 # Пункт «Редактировать список»
 if [ "$choice" = "$EDITLABEL" ]; then
-  setsid -f gvim -- "$LISTFILE" >/dev/null 2>&1
+  setsid -f wezterm start -- nvim -- "$LISTFILE" >/dev/null 2>&1
   exit 0
 fi
 
 # Раскрыть ~ в путь
 case "$choice" in
-  "~/"*|"~")
-    choice="${choice/#\~/$HOME}"
-    ;;
+  "~/"*|"~") choice="${choice/#\~/$HOME}" ;;
 esac
 
-# Открыть выбор в gvim
-setsid -f gvim -- "$choice" >/dev/null 2>&1
+# Открыть выбор в wezterm + nvim
+setsid -f wezterm start -- nvim -- "$choice" >/dev/null 2>&1

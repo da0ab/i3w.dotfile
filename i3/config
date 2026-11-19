@@ -3,24 +3,25 @@ set $mod1 Mod1
 set $term wezterm
 exec --no-startup-id picom -b
 
-# Убираем стандартные рамки, они нам больше не нужны
+# Убираем стандартные рамки
 new_window none
 new_float none
 
-# Шрифт для i3
-font pango:monospace 10
+# Шрифт
+# font pango:monospace 10
+font pango:AnonymicePro Nerd Font Mono 12
 
 # ============================================
 # Именные столы
 # ============================================
-set $ws1 "1: home"
-set $ws2 "2: term"
-set $ws3 "3: tg"
-set $ws4 "4: web"
-set $ws5 "5: files"
-set $ws6 "6: gimp"
-set $ws7 "7: ftp"
-set $ws8 "8:  kee"
+set $ws1 "1:home"
+set $ws2 "2:term"
+set $ws3 "3:tg"
+set $ws4 "4:web"
+set $ws5 "5:files"
+set $ws6 "6:gimp"
+set $ws7 "7:ftp"
+set $ws8 "8:kee"
 set $ws9 "9"
 
 # ============================================
@@ -144,8 +145,9 @@ exec_always --no-startup-id bash -c "killall -q polybar; polybar main &"
 # Фон
 exec --no-startup-id feh --bg-fill "$HOME/.config/i3/fon.png"
 
-exec --no-startup-id i3-msg "workspace $ws3; exec ~/soft/Telegram/Telegram"
-exec --no-startup-id i3-msg "workspace $ws4; exec firefox"
+# exec --no-startup-id i3-msg "workspace $ws3; exec ~/soft/Telegram/Telegram"
+exec --no-startup-id i3-msg "workspace $ws4; exec google-chrome"
+
 
 # neofetch
 #exec --no-startup-id bash -c 'i3-msg "workspace $ws1"; $term -e bash -c "neofetch; exec bash"'

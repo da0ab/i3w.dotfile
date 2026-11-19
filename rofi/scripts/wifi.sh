@@ -8,7 +8,6 @@ while IFS=: read -r NAME TYPE; do
     fi
 done < <(nmcli --terse --fields NAME,TYPE connection show)
 
-# Активные VPN
 declare -A ACTIVE_VPN
 while IFS=: read -r NAME TYPE; do
     if [[ "$TYPE" == "vpn" || "$TYPE" == "wireguard" ]]; then
@@ -16,7 +15,7 @@ while IFS=: read -r NAME TYPE; do
     fi
 done < <(nmcli --terse --fields NAME,TYPE connection show --active)
 
-# ---------- Wi-Fi: дедуп по SSID, максимум сигнала ----------
+# ---------- Wi-Fi: дедуп по SSID ----------
 declare -A BEST_SIGNAL
 declare -A BEST_SEC
 while IFS=: read -r SSID SIGNAL SECURITY; do
@@ -28,11 +27,9 @@ while IFS=: read -r SSID SIGNAL SECURITY; do
     fi
 done < <(nmcli --terse --fields SSID,SIGNAL,SECURITY device wifi list)
 
-# Сохранённые Wi-Fi соединения: SSID -> имя соединения
+# Сохранённые Wi-Fi: SSID -> имя соединения
 declare -A CONN_NAMES
-while IFS=: read -r CONN_LINE; do
-    CONN_NAME=$(echo "$CONN_LINE" | cut -d: -f1)
-    CONN_TYPE=$(echo "$CONN_LINE" | cut -d: -f2)
+while IFS=: read -r CONN_NAME CONN_TYPE; do
     if [[ "$CONN_TYPE" == *"wireless"* ]]; then
         SSID_FULL=$(nmcli --terse --fields 802-11-wireless.ssid connection show "$CONN_NAME" 2>/dev/null)
         if [ -n "$SSID_FULL" ]; then
@@ -40,9 +37,51 @@ while IFS=: read -r CONN_LINE; do
             CONN_NAMES["$SSID"]="$CONN_NAME"
         fi
     fi
-done < <(nmcli --terse connection show)
+done < <(nmcli --terse --fields NAME,TYPE connection show)
 
 ACTIVE_CONN=$(nmcli -t -f NAME connection show --active 2>/dev/null | head -1)
+
+# ---------- Разбиение SSID на группы ----------
+declare -a SAVED_SSIDS
+declare -a OTHER_SSIDS
+for SSID in "${!BEST_SIGNAL[@]}"; do
+    if [ -n "${CONN_NAMES[$SSID]}" ]; then
+        SAVED_SSIDS+=("$SSID")
+    else
+        OTHER_SSIDS+=("$SSID")
+    fi
+done
+
+# Сортировка по сигналу (по убыванию)
+sort_by_signal() {
+    for s in "$@"; do echo "${BEST_SIGNAL[$s]}:$s"; done | sort -t: -k1,1nr | cut -d: -f2-
+}
+mapfile -t SAVED_SORTED < <(sort_by_signal "${SAVED_SSIDS[@]}")
+mapfile -t OTHER_SORTED < <(sort_by_signal "${OTHER_SSIDS[@]}")
+
+# ---------- Формирование строки Wi-Fi ----------
+wifi_line() {
+    local SSID="$1"
+    local SIGNAL=${BEST_SIGNAL[$SSID]}
+    local SECURITY=${BEST_SEC[$SSID]}
+
+    local ACTIVE_ICON="  "
+    if [ -n "$ACTIVE_CONN" ] && [ "${CONN_NAMES[$SSID]}" = "$ACTIVE_CONN" ]; then
+        ACTIVE_ICON="✓ "
+    fi
+
+    local BAR
+    if   [ "$SIGNAL" -gt 75 ]; then BAR="▇▇▇▇"
+    elif [ "$SIGNAL" -gt 50 ]; then BAR="▇▇▇ "
+    elif [ "$SIGNAL" -gt 25 ]; then BAR="▇▇  "
+    else                           BAR="▇   "
+    fi
+
+    local LOCK="🔒"
+    [ "$SECURITY" = "--" ] && LOCK="🔓"
+
+    echo "${ACTIVE_ICON}${BAR} ${SIGNAL}% ${LOCK} ${SSID}"
+}
 
 # ---------- Меню ----------
 MENU="↻ Пересканировать\n"
@@ -64,33 +103,22 @@ if [ ${#VPN_CONNS[@]} -gt 0 ]; then
     MENU+="──────────────\n"
 fi
 
-# Wi-Fi-блок
-for SSID in "${!BEST_SIGNAL[@]}"; do
-    SIGNAL=${BEST_SIGNAL[$SSID]}
-    SECURITY=${BEST_SEC[$SSID]}
+# Сохранённые сети
+if [ ${#SAVED_SORTED[@]} -gt 0 ]; then
+    MENU+="Сохранённые:\n"
+    for SSID in "${SAVED_SORTED[@]}"; do
+        MENU+="$(wifi_line "$SSID")\n"
+    done
+    MENU+="──────────────\n"
+fi
 
-    if [ -n "${CONN_NAMES[$SSID]}" ]; then
-        DISPLAY_NAME="${CONN_NAMES[$SSID]}"
-        SAVED_ICON=" 💾"
-    else
-        DISPLAY_NAME="$SSID"
-        SAVED_ICON=""
-    fi
-
-    ACTIVE_ICON="  "
-    if [ -n "$ACTIVE_CONN" ] && [ "${CONN_NAMES[$SSID]}" = "$ACTIVE_CONN" ]; then
-        ACTIVE_ICON="✓ "
-    fi
-
-    if [ "$SIGNAL" -gt 75 ]; then BAR="▇▇▇▇"
-    elif [ "$SIGNAL" -gt 50 ]; then BAR="▇▇▇ "
-    elif [ "$SIGNAL" -gt 25 ]; then BAR="▇▇  "
-    else BAR="▇   "; fi
-
-    if [ "$SECURITY" = "--" ]; then LOCK="🔓"; else LOCK="🔒"; fi
-
-    MENU+="${ACTIVE_ICON}${BAR} ${SIGNAL}% ${LOCK} ${DISPLAY_NAME}${SAVED_ICON}\n"
-done
+# Остальные сети
+if [ ${#OTHER_SORTED[@]} -gt 0 ]; then
+    MENU+="Доступные сети:\n"
+    for SSID in "${OTHER_SORTED[@]}"; do
+        MENU+="$(wifi_line "$SSID")\n"
+    done
+fi
 
 CHOICE=$(echo -e "$MENU" | rofi -dmenu -p "WiFi" -i -theme-str 'window { width: 800px; }')
 
@@ -107,8 +135,8 @@ case "$CHOICE" in
         notify-send "WiFi" "WiFi выключен" -t 1500 ;;
     "⚙ Настройки")
         nm-connection-editor & ;;
-    "VPN:"|"──────────────")
-        ;; # заголовки/разделители игнорируем
+    "VPN:"|"Сохранённые:"|"Доступные сети:"|"──────────────")
+        ;; # заголовки/разделители
     *)
         # VPN?
         for vpn in "${!VPN_CONNS[@]}"; do
@@ -126,7 +154,7 @@ case "$CHOICE" in
 
         # Wi-Fi
         if echo "$CHOICE" | grep -q "%"; then
-            SELECTED=$(echo "$CHOICE" | sed -E 's/^[✓ ]?▇+ [0-9]+% [🔒🔓]? //' | sed 's/ 💾$//')
+            SELECTED=$(echo "$CHOICE" | sed -E 's/^[✓ ]?▇+ [0-9]+% [🔒🔓] //')
             if [ -n "$SELECTED" ]; then
                 if nmcli connection show "$SELECTED" >/dev/null 2>&1; then
                     nmcli connection up "$SELECTED"
